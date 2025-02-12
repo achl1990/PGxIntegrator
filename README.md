@@ -83,7 +83,7 @@ This project is licensed under the MIT License.
 Pull requests and feature suggestions are welcome! Please create an issue for any bugs or feature requests.
 
 ## Contact
-For questions or collaborations, contact **[Your Name]** at **[Your Email]**.
+For questions or collaborations, contact **achl1990** at **achl1990@snu.ac.kr**.
 
 ---
 🚀 **Automate your pharmacogenetic analysis with PGxIntegrator!**
