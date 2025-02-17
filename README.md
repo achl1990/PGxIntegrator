@@ -43,13 +43,11 @@ python pgxintegrator.py --wes wes.vcf --array array.vcf --reference hs38DH.fa --
 | `--multi-sample` | Treat VCF as multi-sample | `False` |
 | `--split-multi` | Split multi-sample VCF | `True` |
 | `--run-aldy` | Run Aldy analysis | `True` |
-| `--aldy-threads` | Number of parallel Aldy jobs | `8` |
+| `--jobs` | 	Number of parallel jobs for GNU parallel (applies to Aldy and other steps) | `8` |
 | `--aldy-output` | Path to store Aldy results | `./results` |
 | `--output-dir` | Directory for final files | `./results` |
 | `--log` | Path to log file | `./log.txt` |
 | `--keep-temp` | Retain intermediate files | `False` |
-| `--threads` | Number of CPU threads | `8` |
-| `--dry-run` | Run pipeline without executing | `False` |
 
 ## Example Workflows
 ### **Integrate WES + Array and run Aldy**
