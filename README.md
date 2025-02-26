@@ -14,7 +14,7 @@ PGxIntegrator requires Python and several bioinformatics tools, including `bcfto
 
 ```bash
 # Clone the repository
-git clone https://github.com/achl1990/PGxIntegrator.git
+git clone https://github.com/yourusername/PGxIntegrator.git
 cd PGxIntegrator
 
 # Install dependencies
@@ -22,6 +22,8 @@ pip install -r requirements.txt
 ```
 
 ## Usage
+
+**⚠ Note:** The `--integrate` function is currently under review and will be disabled until the next update.
 ### **Basic Command**
 ```bash
 python pgxintegrator.py --wes wes.vcf --array array.vcf --reference hs38DH.fa --gene CYP2C19
@@ -38,16 +40,18 @@ python pgxintegrator.py --wes wes.vcf --array array.vcf --reference hs38DH.fa --
 | `--reference-build-array` | Build of Array data (`hg19` or `hg38`) | **Required if --array** |
 | `--liftover` | Apply hg19 → hg38 LiftOver | `False` |
 | `--gene` | Gene(s) to analyze (`CYP2C19,VKORC1, all`) | **Required** |
-| `--integrate` | Enable WES + Array integration | `False` |
+| `--integrate` | Enable WES + Array integration (**Currently Disabled**) | `False` |
 | `--harmonization` | Standardize, normalize, and filter | `True` |
 | `--multi-sample` | Treat VCF as multi-sample | `False` |
 | `--split-multi` | Split multi-sample VCF | `True` |
 | `--run-aldy` | Run Aldy analysis | `True` |
-| `--jobs` | 	Number of parallel jobs for GNU parallel (applies to Aldy and other steps) | `8` |
+| `--jobs` | Number of parallel jobs for GNU parallel | `8` |
 | `--aldy-output` | Path to store Aldy results | `./results` |
 | `--output-dir` | Directory for final files | `./results` |
 | `--log` | Path to log file | `./log.txt` |
 | `--keep-temp` | Retain intermediate files | `False` |
+| `--jobs` | Number of CPU threads | `8` |
+| `--dry-run` | Run pipeline without executing | `False` |
 
 ## Example Workflows
 ### **Integrate WES + Array and run Aldy**
@@ -81,7 +85,7 @@ This project is licensed under the MIT License.
 Pull requests and feature suggestions are welcome! Please create an issue for any bugs or feature requests.
 
 ## Contact
-For questions or collaborations, contact **achl1990** at **achl1990@snu.ac.kr**.
+For questions or collaborations, contact **[Your Name]** at **[Your Email]**.
 
 ---
 🚀 **Automate your pharmacogenetic analysis with PGxIntegrator!**
