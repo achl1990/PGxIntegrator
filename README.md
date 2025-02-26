@@ -125,6 +125,10 @@ This project is licensed under the MIT License.
 
 Pull requests and feature suggestions are welcome! Please create an issue for any bugs or feature requests.
 
+## Acknowledgment
+
+This project is developed as part of **Seoul National University, Graduate School of Data Science**.
+
 ## Contact
 
 For questions or collaborations, contact **Chanhee Lee** at **achl1990@snu.ac.kr**.
