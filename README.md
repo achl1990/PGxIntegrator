@@ -1,10 +1,10 @@
 # PGxIntegrator
 
-**PGxIntegrator** is a **pipeline** for **integrating Whole Exome Sequencing (WES) and imputed Array data into a WGS-like VCF** for pharmacogenomic analysis. It utilizes various bioinformatics tools to streamline pharmacogenomic analysis and also provides supplementary tools for **multi-sample VCF splitting, Liftover (hg19 → hg38), preprocessing, and parallel Aldy4-based star-allele genotyping**.
+**PGxIntegrator** is a **pipeline** for **integrating Whole Exome Sequencing (WES) and imputed Array data into a WGS-like VCF** for pharmacogenomic analysis. It is a pipelining tool that integrates various bioinformatics tools for ease of use, offering **multi-sample VCF splitting, Liftover (hg19 → hg38), preprocessing, and parallel Aldy4-based star-allele genotyping**.
 
 ## Features
 
-✅ **WES + Array Integration** → Merges WES and imputed array data into a single VCF.\
+✅ **WES + Array Integration** → Merges WES and (imputed) array data into a single VCF.\
 ✅ **Multi-Sample VCF Processing** → Splits multi-sample VCFs into single samples and runs Aldy4 in parallel.\
 ✅ **Automated Preprocessing** → Standardizes, normalizes, and filters variants.\
 ✅ **Liftover Support** → Converts `hg19 → hg38` if needed.\
@@ -12,7 +12,7 @@
 
 ## Installation
 
-PGxIntegrator requires Python and several bioinformatics tools. Python dependencies can be installed using `requirements.txt`, while system tools must be installed separately.
+PGxIntegrator is a pipelining tool that automates various steps in pharmacogenomic analysis, requiring both Python packages and system tools. Python dependencies can be installed using `requirements.txt`, while system tools must be installed separately.
 
 PGxIntegrator requires Python and several bioinformatics tools, including `bcftools`, and `Liftover`. `Aldy4` is required only if running Aldy analysis.
 
@@ -32,15 +32,16 @@ pip install -r requirements.txt
 ### **Basic Command**
 
 ```bash
-python pgxintegrator.py --wes wes.vcf --array array.vcf --reference hs38DH.fa --gene CYP2C19
+python pgxintegrator.py --wes wes.vcf --reference hs38DH.fa --gene CYP2C19  # OR
+python pgxintegrator.py --array array.vcf --reference hs38DH.fa --gene CYP2C19
 ```
 
 ### **Full List of Arguments**
 
 | Argument                  | Description                                             | Default                 |
 | ------------------------- | ------------------------------------------------------- | ----------------------- |
-| `--wes`                   | Path to WES VCF (or CRAM/BAM)                           | **Required**            |
-| `--array`                 | Path to imputed Array VCF                               | Optional                |
+| `--wes` | Path to WES VCF (or CRAM/BAM) | **Required if --array is not provided**            |
+| `--array` | Path to imputed Array VCF | **Required if --wes is not provided**                |
 | `--reference`             | Path to reference genome (`hs38DH.fa`)                  | **Required**            |
 | `--reference-build-wes`   | Build of WES data (`hg19` or `hg38`)                    | **Required**            |
 | `--reference-build-array` | Build of Array data (`hg19` or `hg38`)                  | **Required if --array** |
@@ -71,7 +72,7 @@ python pgxintegrator.py --wes sample_wes.vcf --array sample_array.vcf \
 ### **Split Multi-Sample VCF and Run Aldy in Parallel**
 
 ```bash
-python pgxintegrator.py --wes multi_sample.vcf --split-multi --run-aldy --aldy-threads 16
+python pgxintegrator.py --wes multi_sample.vcf --split-multi --run-aldy --jobs 16
 ```
 
 ### **Apply Liftover from hg19 to hg38**
@@ -89,10 +90,8 @@ pip install -r requirements.txt
 ```
 
 - `pandas`
-- `numpy`
-- `scipy`
-- `pyvcf`
-- `biopython`
+- `requests`
+- `matplotlib`
 
 ### **System Tools**
 These must be installed separately:
