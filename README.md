@@ -1,9 +1,9 @@
 # PGxIntegrator
 
-**PGxIntegrator** is a toolkit for **integrating Whole Exome Sequencing (WES) and imputed Array data into a WGS-like VCF** for pharmacogenomic analysis. It also provides supplementary tools for **multi-sample VCF splitting, Liftover (hg19 → hg38), preprocessing, and parallel Aldy4-based star-allele genotyping**.
+**PGxIntegrator** is a **pipeline** for **integrating Whole Exome Sequencing (WES) and imputed Array data into a WGS-like VCF** for pharmacogenomic analysis. It utilizes various bioinformatics tools to streamline pharmacogenomic analysis and also provides supplementary tools for **multi-sample VCF splitting, Liftover (hg19 → hg38), preprocessing, and parallel Aldy4-based star-allele genotyping**.
 
 ## Features
-✅ **WES + Array Integration** → Merges WES and (imputed) array data into a single VCF.  
+✅ **WES + Array Integration** → Merges WES and imputed array data into a single VCF.  
 ✅ **Multi-Sample VCF Processing** → Splits multi-sample VCFs into single samples and runs Aldy4 in parallel.  
 ✅ **Automated Preprocessing** → Standardizes, normalizes, and filters variants.  
 ✅ **Liftover Support** → Converts `hg19 → hg38` if needed.  
@@ -23,7 +23,7 @@ pip install -r requirements.txt
 
 ## Usage
 
-**⚠ Note:** The `--integrate` function is currently under review and will be disabled until the next update.
+**⚠ Note:** The `--integrate` function is currently under development and will be disabled until the next update.
 ### **Basic Command**
 ```bash
 python pgxintegrator.py --wes wes.vcf --array array.vcf --reference hs38DH.fa --gene CYP2C19
