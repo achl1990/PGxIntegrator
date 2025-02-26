@@ -18,7 +18,7 @@ PGxIntegrator requires Python and several bioinformatics tools, including `bcfto
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/PGxIntegrator.git
+git clone https://github.com/achl1990/PGxIntegrator.git
 cd PGxIntegrator
 
 # Install dependencies
