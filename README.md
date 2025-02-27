@@ -3,14 +3,17 @@
 **PGxIntegrator** is a **pipeline** for **integrating Whole Exome Sequencing (WES) and imputed Array data into a WGS-like VCF** for pharmacogenomic analysis. It is a pipelining tool that integrates various bioinformatics tools for ease of use, offering **multi-sample VCF splitting, Liftover (hg19 → hg38), preprocessing, and parallel Aldy4-based star-allele genotyping**.
 
 
+## How PGxIntegrator Works
+
+PGxIntegrator **integrates Whole Exome Sequencing (WES) and (imputed) Array data** to create a **WGS-like dataset** for pharmacogenomic analysis. This enables better variant calling and star allele genotyping.
+
 The diagram below illustrates the integration process:
 
-![WES + Array Integration](docs/wes_array_integration_figure.png)
+![WES + Array Integration](https://raw.githubusercontent.com/achl1990/PGxIntegrator/main/wes_array_integration_figure.png)
 
 - **WES (Top Line):** Captures exonic regions but misses intronic or regulatory variants.
 - **Array (Middle Line):** Captures known pharmacogenomic SNPs and structural variants.
 - **WES + Array (Bottom Line):** Combines both sources, ensuring comprehensive variant detection.
-
 
 ## Features
 
