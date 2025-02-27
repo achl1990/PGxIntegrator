@@ -9,6 +9,7 @@
 ✅ **Automated Preprocessing** → Standardizes, normalizes, and filters variants.\
 ✅ **Liftover Support** → Converts `hg19 → hg38` if needed.\
 ✅ **Flexible & Scalable** → Works with both single-sample and multi-sample VCFs.
+✅ **Fetch Gene Coordinates** → Retrieves gene coordinates from **Ensembl (GRCh37/hg19 or GRCh38/hg38)** for updating pharmacogenes.
 
 ## Installation
 
@@ -73,6 +74,13 @@ python pgxintegrator.py --wes sample_wes.vcf --array sample_array.vcf \
 
 ```bash
 python pgxintegrator.py --wes multi_sample.vcf --split-multi --run-aldy --jobs 16
+```
+
+### **Fetching Gene Coordinates from Ensembl**
+PGxIntegrator can retrieve genomic coordinates for pharmacogenes from **Ensembl**, helping update Aldy configurations when new genes are added.
+
+```bash
+python pgxintegrator.py --fetch-coordinates --build hg38 --output gene_coordinates.tsv
 ```
 
 ### **Apply Liftover from hg19 to hg38**
