@@ -8,7 +8,7 @@
 ✅ **Multi-Sample VCF Processing** → Splits multi-sample VCFs into single samples and runs Aldy4 in parallel.\
 ✅ **Automated Preprocessing** → Standardizes, normalizes, and filters variants.\
 ✅ **Liftover Support** → Converts `hg19 → hg38` if needed.\
-✅ **Flexible & Scalable** → Works with both single-sample and multi-sample VCFs.
+✅ **Flexible & Scalable** → Works with both single-sample and multi-sample VCFs. \
 ✅ **Fetch Gene Coordinates** → Retrieves gene coordinates from **Ensembl (GRCh37/hg19 or GRCh38/hg38)** for updating pharmacogenes.
 
 ## Installation
