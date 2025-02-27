@@ -41,8 +41,8 @@ python pgxintegrator.py --array array.vcf --reference hs38DH.fa --gene CYP2C19
 
 | Argument                  | Description                                             | Default                 |
 | ------------------------- | ------------------------------------------------------- | ----------------------- |
-| `--wes` | Path to WES VCF (or CRAM/BAM) | **Required if --array or --fetch-coordinates is not provided** |
-| `--array` | Path to imputed Array VCF | **Required if --wes or --fetch-coordinates is not provided** |
+| `--wes` | Path to WES VCF (or CRAM/BAM) | **At least one of --wes or --array is required. You may provide both.** |
+| `--array` | Path to imputed Array VCF | **At least one of --wes or --array is required. You may provide both.** |
 | `--fetch-coordinates` | Fetch gene coordinates from Ensembl and save to a file | `False` |
 | `--build` | Genome build for Ensembl coordinate fetching (`hg19` or `hg38`) | `hg38` |
 | `--buffer-size` | Buffer size around gene coordinates (in bp) | `10000` |
