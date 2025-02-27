@@ -4,25 +4,32 @@ import sys
 
 parser = argparse.ArgumentParser(description="PGxIntegrator: Pharmacogenomic Analysis Pipeline")
 
-# Required arguments
+# Required input: Either WES, Array, or Fetch Coordinates
 parser.add_argument("--wes", help="Path to WES VCF")
 parser.add_argument("--array", help="Path to imputed Array VCF")
+parser.add_argument("--fetch-coordinates", action="store_true", help="Fetch gene coordinates from Ensembl")
+
+# Required arguments
 parser.add_argument("--reference", required=True, help="Reference genome (hs38DH.fa)")
 parser.add_argument("--gene", required=True, help="Target genes for Aldy (comma-separated or 'all')")
 parser.add_argument("--output-dir", required=True, help="Directory for output files")
 
+# Fetch Coordinates Options
+parser.add_argument("--build", choices=["hg19", "hg38"], default="hg38", help="Genome build for gene coordinates")
+parser.add_argument("--buffer-size", type=int, default=10000, help="Buffer size around gene coordinates (default: 10,000 bp)")
+
 # Optional arguments
 parser.add_argument("--multi-sample", action="store_true", help="Indicates if input VCF is multi-sample")
-parser.add_argument("--integrate", action="store_true", help="Enable WES + Array integration")    # Currently disabled
+parser.add_argument("--integrate", action="store_true", help="Enable WES + Array integration")  # Currently disabled
 parser.add_argument("--run-aldy", action="store_true", help="Run Aldy4 for genotyping")
 parser.add_argument("--process-aldy-solutions", action="store_true", help="Process Aldy4 solutions")
 parser.add_argument("--visualize", action="store_true", help="Generate visualizations")
 
 args = parser.parse_args()
 
-# At least one of --wes or --array is required
-if not args.wes and not args.array:
-    print("Error: At least one of --wes or --array must be provided.", file=sys.stderr)
+# Ensure at least one input option is given
+if not args.wes and not args.array and not args.fetch_coordinates:
+    print("Error: At least one of --wes, --array, or --fetch-coordinates must be provided.", file=sys.stderr)
     sys.exit(1)
 
 # Define output directories
@@ -33,9 +40,16 @@ single_sample_vcf = f"{args.output_dir}/single_sample_vcfs"
 aldy_output = f"{args.output_dir}/aldy_results"
 processed_aldy_results = f"{args.output_dir}/processed_aldy_results"
 visualization_results = f"{args.output_dir}/visualization_results"
+gene_coordinates_file = f"{args.output_dir}/gene_coordinates.tsv"
 
 # Ensure output directory exists
 subprocess.run(["mkdir", "-p", args.output_dir])
+
+# Step 0: Fetch Gene Coordinates (if requested)
+if args.fetch_coordinates:
+    subprocess.run(["python", "fetch_gene_coords.py", "--build", args.build, "--buffer-size", str(args.buffer_size), "--output", gene_coordinates_file])
+    print(f"Gene coordinates saved to {gene_coordinates_file}")
+    sys.exit(0)  # Exit after fetching coordinates if no other tasks were requested
 
 # Step 1: Extract VCF by Gene
 input_vcf = args.wes if args.wes else args.array
