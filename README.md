@@ -41,24 +41,22 @@ python pgxintegrator.py --array array.vcf --reference hs38DH.fa --gene CYP2C19
 
 | Argument                  | Description                                             | Default                 |
 | ------------------------- | ------------------------------------------------------- | ----------------------- |
-| `--wes` | Path to WES VCF (or CRAM/BAM) | **Required if --array is not provided**            |
-| `--array` | Path to imputed Array VCF | **Required if --wes is not provided**                |
+| `--wes` | Path to WES VCF (or CRAM/BAM) | **Required if --array or --fetch-coordinates is not provided** |
+| `--array` | Path to imputed Array VCF | **Required if --wes or --fetch-coordinates is not provided** |
+| `--fetch-coordinates` | Fetch gene coordinates from Ensembl and save to a file | `False` |
+| `--build` | Genome build for Ensembl coordinate fetching (`hg19` or `hg38`) | `hg38` |
+| `--buffer-size` | Buffer size around gene coordinates (in bp) | `10000` |
 | `--reference`             | Path to reference genome (`hs38DH.fa`)                  | **Required**            |
-| `--reference-build-wes`   | Build of WES data (`hg19` or `hg38`)                    | **Required**            |
-| `--reference-build-array` | Build of Array data (`hg19` or `hg38`)                  | **Required if --array** |
-| `--liftover`              | Apply hg19 → hg38 LiftOver                              | `False`                 |
 | `--gene`                  | Gene(s) to analyze (`CYP2C19,VKORC1, all`)              | **Required**            |
+| `--output-dir`            | Directory for final files                               | **Required**            |
 | `--integrate`             | Enable WES + Array integration (**Currently Disabled**) | `False`                 |
-| `--harmonization`         | Standardize, normalize, and filter                      | `True`                  |
 | `--multi-sample`          | Treat VCF as multi-sample                               | `False`                 |
 | `--split-multi`           | Split multi-sample VCF                                  | `True`                  |
 | `--run-aldy`              | Run Aldy analysis                                       | `True`                  |
 | `--jobs`                  | Number of parallel jobs for GNU parallel                | `8`                     |
 | `--aldy-output`           | Path to store Aldy results                              | `./results`             |
-| `--output-dir`            | Directory for final files                               | **Required**            |
 | `--log`                   | Path to log file                                        | `./log.txt`             |
 | `--keep-temp`             | Retain intermediate files                               | `False`                 |
-| `--jobs`                  | Number of CPU threads                                   | `8`                     |
 | `--dry-run`               | Run pipeline without executing                          | `False`                 |
 
 ## Example Workflows
