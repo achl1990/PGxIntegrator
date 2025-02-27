@@ -74,11 +74,9 @@ python pgxintegrator.py --wes sample_wes.vcf --array sample_array.vcf \
 python pgxintegrator.py --wes multi_sample.vcf --split-multi --run-aldy --jobs 16
 ```
 
-### **Fetching Gene Coordinates from Ensembl**
-PGxIntegrator can retrieve genomic coordinates for pharmacogenes from **Ensembl**, helping update Aldy configurations when new genes are added.
-
+### **Fetch Updated Coordinates for Pharmacogenes**
 ```bash
-python pgxintegrator.py --fetch-coordinates --build hg38 --output gene_coordinates.tsv
+python pgxintegrator.py --fetch-coordinates --build hg38 --buffer-size 10000 --output-dir results
 ```
 
 ### **Apply Liftover from hg19 to hg38**
