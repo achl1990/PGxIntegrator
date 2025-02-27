@@ -55,7 +55,7 @@ python pgxintegrator.py --array array.vcf --reference hs38DH.fa --gene CYP2C19
 | `--run-aldy`              | Run Aldy analysis                                       | `True`                  |
 | `--jobs`                  | Number of parallel jobs for GNU parallel                | `8`                     |
 | `--aldy-output`           | Path to store Aldy results                              | `./results`             |
-| `--output-dir`            | Directory for final files                               | `./results`             |
+| `--output-dir`            | Directory for final files                               | **Required**            |
 | `--log`                   | Path to log file                                        | `./log.txt`             |
 | `--keep-temp`             | Retain intermediate files                               | `False`                 |
 | `--jobs`                  | Number of CPU threads                                   | `8`                     |
