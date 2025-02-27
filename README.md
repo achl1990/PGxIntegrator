@@ -9,7 +9,9 @@ PGxIntegrator **integrates Whole Exome Sequencing (WES) and (imputed) Array data
 
 The diagram below illustrates the integration process:
 
-![WES + Array Integration](https://raw.githubusercontent.com/achl1990/PGxIntegrator/main/wes_array_integration_figure.png)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/achl1990/PGxIntegrator/main/docs/wes_array_integration_figure.png" alt="WES + Array Integration" width="60%">
+</p>
 
 - **WES (Top Line):** Captures exonic regions but misses intronic or regulatory variants.
 - **Array (Middle Line):** Captures known pharmacogenomic SNPs and structural variants.
