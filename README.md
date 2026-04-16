@@ -1,150 +1,223 @@
 # PGxIntegrator
 
-**PGxIntegrator** is a **pipeline** for **integrating Whole Exome Sequencing (WES) and imputed Array data into a WGS-like VCF** for pharmacogenomic analysis. It is a pipelining tool that integrates various bioinformatics tools for ease of use, offering **multi-sample VCF splitting, Liftover (hg19 → hg38), preprocessing, and parallel Aldy4-based star-allele genotyping**.
-
-The diagram below illustrates the integration process:
-
-![WES + Array Integration](https://raw.githubusercontent.com/achl1990/PGxIntegrator/main/wes_array_integration_figure.png)
-
-- **WES (Top Line):** Captures exonic regions but misses intronic or regulatory variants.
-- **Array (Middle Line):** Captures known pharmacogenomic SNPs and structural variants.
-- **WES + Array (Bottom Line):** Combines both sources, ensuring comprehensive variant detection.
+PGxIntegrator is a stage-based pipeline for preparing pharmacogenomic VCF inputs and running **Aldy4** for star-allele calling.
 
 ## Features
 
-✅ **WES + Array Integration** → Merges WES and (imputed) array data into a single VCF.\
-✅ **Multi-Sample VCF Processing** → Splits multi-sample VCFs into single samples and runs Aldy4 in parallel.\
-✅ **Automated Preprocessing** → Standardizes, normalizes, and filters variants.\
-✅ **Liftover Support** → Converts `hg19 → hg38` if needed.\
-✅ **Flexible & Scalable** → Works with both single-sample and multi-sample VCFs. \
-✅ **Fetch Gene Coordinates** → Retrieves gene coordinates from **Ensembl (GRCh37/hg19 or GRCh38/hg38)** for updating pharmacogenes.
+* Prepare platform-specific and integrated per-gene VCFs
+* Split cohort-level VCFs into single-sample VCFs
+* Run Aldy4 in parallel across genes and samples
+* Support config-based runs with optional CLI overrides
+* Organize outputs, logs, and restartable runs
+
+## Workflow
+
+```bash
+pgx prepare --config config.yaml
+pgx split --config config.yaml
+pgx aldy --config config.yaml
+```
+
+You can also override config values from the command line:
+
+```bash
+pgx aldy --config config.yaml --jobs 32 --resume
+```
 
 ## Installation
 
-PGxIntegrator is a pipelining tool that automates various steps in pharmacogenomic analysis, requiring both Python packages and system tools. Python dependencies can be installed using `requirements.txt`, while system tools must be installed separately.
-
-PGxIntegrator requires Python and several bioinformatics tools, including `bcftools`, and `Liftover`. `Aldy4` is required only if running Aldy analysis.
-
 ```bash
-# Clone the repository
-git clone https://github.com/achl1990/PGxIntegrator.git
+git clone <repo-url>
 cd PGxIntegrator
-
-# Install dependencies
-pip install -r requirements.txt
+pip install -e .
 ```
 
-## Usage
+## Quick start
 
-**⚠ Note:** The `--integrate` function is currently under development and will be disabled until the next update.
+### 1. Create a config file
 
-### **Basic Command**
+Example:
+
+```yaml
+project_name: example_pgx
+
+reference:
+  fasta: /path/to/hs38DH.fa
+  build: hg38
+
+inputs:
+  sample_manifest: /path/to/sample_manifest.tsv
+  gene_manifest: /path/to/gene_manifest.tsv
+
+prepare:
+  output_dir: /path/to/prepared
+  normalize: true
+  harmonize_array: true
+
+liftover:
+  target_build: hg38
+  enabled: true
+  chain_file: /path/to/sourceToTarget.over.chain.gz
+
+split:
+  output_dir: /path/to/single_sample_vcfs
+  samples_per_batch: 1000
+
+aldy:
+  output_dir: /path/to/aldy_results
+  jobs: 16
+  genome: hg38
+  profile: wgs
+  reference_fasta: /path/to/hs38DH.fa
+```
+
+### 2. Prepare per-gene VCFs
 
 ```bash
-python pgxintegrator.py --wes wes.vcf --reference hs38DH.fa --gene CYP2C19  # OR
-python pgxintegrator.py --array array.vcf --reference hs38DH.fa --gene CYP2C19
+pgx prepare --config config.yaml
 ```
 
-### **Full List of Arguments**
-
-| Argument                  | Description                                             | Default                 |
-| ------------------------- | ------------------------------------------------------- | ----------------------- |
-| `--wes` | Path to WES VCF (or CRAM/BAM) | **At least one of --wes or --array is required. You may provide both.** |
-| `--array` | Path to imputed Array VCF | **At least one of --wes or --array is required. You may provide both.** |
-| `--fetch-coordinates` | Fetch gene coordinates from Ensembl and save to a file | `False` |
-| `--build` | Genome build for Ensembl coordinate fetching (`hg19` or `hg38`) | `hg38` |
-| `--buffer-size` | Buffer size around gene coordinates (in bp) | `10000` |
-| `--reference`             | Path to reference genome (`hs38DH.fa`)                  | **Required**            |
-| `--gene`                  | Gene(s) to analyze (`CYP2C19,VKORC1, all`)              | **Required**            |
-| `--output-dir`            | Directory for final files                               | **Required**            |
-| `--integrate`             | Enable WES + Array integration (**Currently Disabled**) | `False`                 |
-| `--multi-sample`          | Treat VCF as multi-sample                               | `False`                 |
-| `--split-multi`           | Split multi-sample VCF                                  | `True`                  |
-| `--run-aldy`              | Run Aldy analysis                                       | `True`                  |
-| `--jobs`                  | Number of parallel jobs for GNU parallel                | `8`                     |
-| `--aldy-output`           | Path to store Aldy results                              | `./results`             |
-| `--log`                   | Path to log file                                        | `./log.txt`             |
-| `--keep-temp`             | Retain intermediate files                               | `False`                 |
-| `--dry-run`               | Run pipeline without executing                          | `False`                 |
-
-## Example Workflows
-
-### **Integrate WES + Array and run Aldy**
+### 3. Split per-gene VCFs into single-sample VCFs
 
 ```bash
-python pgxintegrator.py --wes sample_wes.vcf --array sample_array.vcf \
-  --reference hs38DH.fa --gene CYP2C19 --integrate --run-aldy
+pgx split --config config.yaml
 ```
 
-### **Split Multi-Sample VCF and Run Aldy in Parallel**
+### 4. Run Aldy4
 
 ```bash
-python pgxintegrator.py --wes multi_sample.vcf --split-multi --run-aldy --jobs 16
+pgx aldy --config config.yaml
 ```
 
-### **Fetch Updated Coordinates for Pharmacogenes**
+## Input files
+
+### Sample manifest
+
+Tab-delimited file listing the samples to process.
+
+Example:
+
+```tsv
+sample_id	array_id	wes_id
+S001	12345_12345	S001
+S002	67890_67890	S002
+```
+
+### Gene manifest
+
+Tab-delimited file mapping each gene and platform to an input VCF. Each input must declare its source build explicitly.
+
+Example:
+
+```tsv
+gene	platform	build	path
+CYP2B6	wes	hg38	/data/wes/CYP2B6_wes_hg38.vcf.gz
+CYP2B6	array	hg19	/data/array/CYP2B6_array_hg19.vcf.gz
+SLCO1B1	wes	hg19	/data/wes/SLCO1B1_wes_hg19.vcf.gz
+SLCO1B1	array	hg38	/data/array/SLCO1B1_array_hg38.vcf.gz
+```
+
+If an input build differs from the pipeline target build, that input can be lifted over during `pgx prepare`.
+
+## Commands
+
+### `pgx prepare`
+
+Prepares per-gene VCFs from the provided inputs.
+
+Typical tasks may include:
+
+* sample extraction
+* sample renaming
+* liftover when needed
+* normalization
+* harmonization
+* integration of WES and array variants
+
+Example:
+
 ```bash
-python pgxintegrator.py --fetch-coordinates --build hg38 --buffer-size 10000 --output-dir results
+pgx prepare --config config.yaml
 ```
 
-### **Apply Liftover from hg19 to hg38**
+With CLI overrides:
 
 ```bash
-python pgxintegrator.py --wes sample_wes_hg19.vcf --liftover --reference hs38DH.fa
+pgx prepare --config config.yaml --output-dir ./prepared
 ```
 
-## Dependencies
+### `pgx split`
 
-### **Python Packages**
-These can be installed using `requirements.txt`:
+Splits per-gene cohort VCFs into single-sample VCFs.
+
+Example:
+
 ```bash
-pip install -r requirements.txt
+pgx split --config config.yaml
 ```
 
-- `pandas`
-- `requests`
-- `matplotlib`
+### `pgx aldy`
 
-### **System Tools**
-These must be installed separately:
+Runs Aldy4 on prepared single-sample VCFs.
+
+Example:
+
 ```bash
-# Install via apt (Ubuntu/Debian)
-sudo apt install bcftools parallel
-
-# Install via conda
-conda install bioconda::bcftools bioconda::ucsc-liftover
+pgx aldy --config config.yaml
 ```
 
-- `bcftools`
-- `GNU parallel`
-- `Aldy4` (only required if running Aldy analysis)
-- `UCSC LiftOver` (for reference genome conversions)
+With CLI overrides:
 
-PGxIntegrator requires the following tools:
+```bash
+pgx aldy --config config.yaml --jobs 32 --resume
+```
 
-- **Python 3**
-- `bcftools`
-- `Aldy4`
-- `Liftover` (if reference builds differ)
-- `GNU parallel` (for batch processing)
+## Output layout
+
+Example directory structure:
+
+```text
+results/
+  prepared/
+    CYP2B6_merged.vcf.gz
+    SLCO1B1_merged.vcf.gz
+  single_sample_vcfs/
+    CYP2B6/
+      batch_000/
+        SAMPLE1.vcf.gz
+        SAMPLE1.vcf.gz.csi
+    SLCO1B1/
+      batch_000/
+        SAMPLE1.vcf.gz
+        SAMPLE1.vcf.gz.csi
+  aldy_results/
+    CYP2B6/
+      batch_000/
+        SAMPLE1_CYP2B6_aldy.out
+        SAMPLE1_CYP2B6_aldy.log
+```
+
+## Notes
+
+* Declare the source build for every input dataset.
+* Use one target build consistently across all stages.
+* Any input source can require liftover during `pgx prepare` if its build differs from the target build.
+* Aldy settings such as `profile`, `genome`, and `reference_fasta` should match the prepared VCFs.
+* Completed runs can be resumed using `--resume` when supported.
+
+## Roadmap
+
+Planned additions include:
+
+* packaged release on PyPI
+* example datasets
+* validation checks for manifests and reference builds
+* optional downstream summary utilities
 
 ## License
 
-This project is licensed under the MIT License.
+Add your license here.
 
-## Contributing
+## Citation
 
-Pull requests and feature suggestions are welcome! Please create an issue for any bugs or feature requests.
-
-## Acknowledgment
-
-This project is developed as part of **Seoul National University, Graduate School of Data Science**.
-
-## Contact
-
-For questions or collaborations, contact **Chanhee Lee** at **achl1990@snu.ac.kr**.
-
----
-
-🚀 **Automate your pharmacogenetic analysis with PGxIntegrator!**
-
+Citation information will be added after release.
