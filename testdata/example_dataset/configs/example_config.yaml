@@ -1,0 +1,38 @@
+project_name: example_dataset_mixed_layout
+
+reference:
+  fasta: /path/to/hs38DH.fa
+  build: hg38
+
+inputs:
+  sample_manifest: ../manifests/sample_manifest.tsv
+  dataset_manifest: ../manifests/dataset_manifest.tsv
+  gene_list: ../manifests/gene_list.tsv
+
+prepare:
+  output_dir: ../outputs/prepared
+  normalize: true
+  harmonize: true
+  sample_missingness_threshold: 0.05
+  keep_intermediate: false
+  resume: false
+
+liftover:
+  enabled: true
+  target_build: hg38
+
+split:
+  output_dir: ../outputs/split
+  input_dir: ../outputs/prepared
+  samples_per_batch: 3
+  jobs: 2
+  resume: false
+
+aldy:
+  output_dir: ../outputs/aldy
+  input_dir: ../outputs/split
+  jobs: 2
+  genome: hg38
+  profile: wgs
+  reference_fasta: /path/to/hs38DH.fa
+  resume: false
