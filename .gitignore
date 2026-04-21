@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+.DS_Store
+*.zip
+*.tar.gz
+
+testdata/example_dataset/outputs/
+testdata/example_dataset/_tmp/

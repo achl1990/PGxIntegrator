@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pgxintegrator"
+version = "0.1.0"
+description = "Stage-based pipeline for integrating pharmacogenomic data and preparing per-gene VCFs for Aldy4 star-allele calling."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [
+  { name = "Chanhee Lee" }
+]
+dependencies = [
+  "PyYAML>=6.0"
+]
+
+[project.scripts]
+pgx = "pgxintegrator.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+pgxintegrator = ["resources/chains/*.gz"]

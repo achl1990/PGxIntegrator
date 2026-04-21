@@ -1,0 +1,5 @@
+dataset_id	platform	build	layout	chrom	gene	path
+wes_chr10	wes	hg38	cohort_by_chrom	10		../wes/chr10_wes_hg38.vcf.gz
+array_chr10	array	hg19	cohort_by_chrom	10		../array/chr10_array_hg19.vcf.gz
+wes_vkorc1	wes	hg38	gene_by_file		VKORC1	../wes/VKORC1_wes_hg38.vcf.gz
+array_vkorc1	array	hg19	gene_by_file		VKORC1	../array/VKORC1_array_hg19.vcf.gz
