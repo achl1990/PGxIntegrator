@@ -7,7 +7,7 @@ name = "pgxintegrator"
 version = "0.1.0"
 description = "Stage-based pipeline for integrating pharmacogenomic data and preparing per-gene VCFs for Aldy4 star-allele calling."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.8,<3.9"
 license = { text = "MIT" }
 authors = [
   { name = "Chanhee Lee" }
