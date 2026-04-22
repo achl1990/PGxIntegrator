@@ -56,11 +56,29 @@ The pipeline is not strictly limited to these versions, but the following were u
 
 ## Installation
 
+PGxIntegrator was tested with **Python 3.8**.
+
+Create a Python 3.8 environment, then install the package:
+
 ```bash
 git clone <repo-url>
 cd PGxIntegrator
+python3.8 -m venv .venv
+source .venv/bin/activate
 pip install -e .
 ```
+
+If you prefer, you can also install Python dependencies with:
+
+```bash
+pip install -r requirements.txt
+```
+
+## Compatibility notes
+
+- Tested with **Python 3.8**
+- Other Python versions may work, but have not yet been fully validated
+- External tools such as `bcftools`, `bgzip`, `liftOver`, and `Aldy4` must be installed separately and available on your `PATH`
 
 ## Quick start
 
