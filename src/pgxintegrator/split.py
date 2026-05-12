@@ -262,7 +262,9 @@ def _build_split_plan_from_inputs(
         if preferred_sample_order is None:
             selected_samples = list(vcf_samples)
         else:
-            selected_samples = [sample_id for sample_id in preferred_sample_order if sample_id in vcf_samples]
+            selected_samples = [
+                sample_id for sample_id in preferred_sample_order if sample_id in vcf_samples
+            ]
 
         if not selected_samples:
             raise SplitPlanError(
@@ -318,61 +320,114 @@ def _execute_split_jobs(
 ) -> None:
     plan.output_dir.mkdir(parents=True, exist_ok=True)
 
-    split_jobs = _collect_split_jobs(plan=plan, resume=resume)
-    if not split_jobs:
-        return
+    total_genes = len(plan.gene_plans)
 
-    if jobs == 1:
-        for job in split_jobs:
-            _run_single_split_job(job)
-        return
-
-    errors: List[str] = []
-    with ThreadPoolExecutor(max_workers=jobs) as executor:
-        future_to_job = {
-            executor.submit(_run_single_split_job, job): job
-            for job in split_jobs
-        }
-
-        for future in as_completed(future_to_job):
-            job = future_to_job[future]
-            try:
-                future.result()
-            except Exception as exc:
-                errors.append(
-                    "[gene={} sample={}] {}".format(
-                        job["gene"],
-                        job["sample_id"],
-                        exc,
-                    )
-                )
-
-    if errors:
-        raise SplitExecutionError(
-            "One or more split jobs failed:\n{}".format("\n".join(errors))
+    for gene_idx, gene_plan in enumerate(plan.gene_plans, start=1):
+        gene_jobs = _collect_gene_split_jobs(
+            gene_plan=gene_plan,
+            resume=resume,
         )
 
+        if not gene_jobs:
+            print(
+                "[INFO] Split {} ({}/{}) already complete; skipping".format(
+                    gene_plan.gene,
+                    gene_idx,
+                    total_genes,
+                )
+            )
+            continue
 
-def _collect_split_jobs(plan: SplitPlan, resume: bool) -> List[dict]:
+        print(
+            "[INFO] Split {} ({}/{}) | samples={} | batches={} | pending_jobs={}".format(
+                gene_plan.gene,
+                gene_idx,
+                total_genes,
+                gene_plan.sample_count,
+                gene_plan.batch_count,
+                len(gene_jobs),
+            )
+        )
+
+        max_workers = max(1, min(jobs, len(gene_jobs)))
+
+        if max_workers == 1:
+            completed = 0
+            for job in gene_jobs:
+                _run_single_split_job(job)
+                completed += 1
+                if completed <= 5 or completed % 50 == 0 or completed == len(gene_jobs):
+                    print(
+                        "[INFO]   {}: completed {}/{}".format(
+                            gene_plan.gene,
+                            completed,
+                            len(gene_jobs),
+                        )
+                    )
+            continue
+
+        errors: List[str] = []
+        completed = 0
+
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            future_to_job = {
+                executor.submit(_run_single_split_job, job): job
+                for job in gene_jobs
+            }
+
+            for future in as_completed(future_to_job):
+                job = future_to_job[future]
+                try:
+                    future.result()
+                    completed += 1
+                    if completed <= 5 or completed % 50 == 0 or completed == len(gene_jobs):
+                        print(
+                            "[INFO]   {}: completed {}/{}".format(
+                                gene_plan.gene,
+                                completed,
+                                len(gene_jobs),
+                            )
+                        )
+                except Exception as exc:
+                    errors.append(
+                        "[gene={} sample={}] {}".format(
+                            job["gene"],
+                            job["sample_id"],
+                            exc,
+                        )
+                    )
+
+        if errors:
+            raise SplitExecutionError(
+                "Split failed for gene {}:\n{}".format(
+                    gene_plan.gene,
+                    "\n".join(errors),
+                )
+            )
+
+
+def _collect_gene_split_jobs(
+    gene_plan: SplitGenePlan,
+    resume: bool,
+) -> List[dict]:
     jobs: List[dict] = []
 
-    for gene_plan in plan.gene_plans:
-        for sample_plan in gene_plan.sample_plans:
-            output_vcf = sample_plan.output_vcf
-            output_index = Path(str(output_vcf) + ".csi")
-            output_vcf.parent.mkdir(parents=True, exist_ok=True)
+    for sample_plan in gene_plan.sample_plans:
+        output_vcf = sample_plan.output_vcf
+        output_index = Path(str(output_vcf) + ".csi")
+        output_vcf.parent.mkdir(parents=True, exist_ok=True)
 
-            if resume and output_vcf.exists() and output_index.exists():
-                continue
+        if resume and output_vcf.exists() and output_index.exists():
+            continue
 
-            jobs.append(
-                {
-                    "gene": gene_plan.gene,
-                    "input_vcf": gene_plan.input_vcf,
-                    "sample_id": sample_plan.sample_id,
-                    "output_vcf": output_vcf,
-                }
-            )
+        jobs.append(
+            {
+                "gene": gene_plan.gene,
+                "input_vcf": gene_plan.input_vcf,
+                "sample_id": sample_plan.sample_id,
+                "output_vcf": output_vcf,
+            }
+        )
 
     return jobs
 
