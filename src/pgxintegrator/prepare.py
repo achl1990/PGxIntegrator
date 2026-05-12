@@ -348,6 +348,7 @@ def _execute_prepare_plan(
             renamed_vcf = gene_work_dir / "{}.{}.renamed.vcf.gz".format(gene_plan.gene, platform)
             lifted_vcf = gene_work_dir / "{}.{}.lifted.vcf.gz".format(gene_plan.gene, platform)
             normalized_vcf = gene_work_dir / "{}.{}.norm.vcf.gz".format(gene_plan.gene, platform)
+            sanitized_vcf = gene_work_dir / "{}.{}.ready.vcf.gz".format(gene_plan.gene, platform)
 
             _write_platform_bed_file(platform_plan=platform_plan, bed_path=region_bed)
 
@@ -391,7 +392,13 @@ def _execute_prepare_plan(
                 reference_fasta=cfg.reference.fasta,
             )
             _index_vcf(normalized_vcf)
-            ready_inputs[platform] = normalized_vcf
+
+            _sanitize_vcf_for_integration(
+                input_vcf=normalized_vcf,
+                output_vcf=sanitized_vcf,
+            )
+            _index_vcf(sanitized_vcf)
+            ready_inputs[platform] = sanitized_vcf
 
         if "wes" in ready_inputs and "array" in ready_inputs:
             _integrate_gene_vcfs(
@@ -692,6 +699,37 @@ def _normalize_vcf(
         "-o",
         str(output_vcf),
         str(current_input),
+    ]
+    _run_command(cmd)
+
+
+def _sanitize_vcf_for_integration(
+    input_vcf: Path,
+    output_vcf: Path,
+) -> None:
+    """
+    Reduce a platform VCF to a minimal PGx-ready schema before final integration.
+
+    Rationale
+    ---------
+    Imputed VCFs often carry platform-specific INFO/FORMAT tags such as
+    IMPUTED, MAF, AVG_CS, R2, DS, GP, and HDS. The current integration logic
+    writes the full WES header and then appends array body records, so any
+    array-only header definitions are lost and downstream parsing can fail.
+
+    For Aldy-focused per-gene integration we only need valid variant records
+    with canonical sample names and GT. Therefore we strip all INFO fields and
+    all FORMAT fields except GT here.
+    """
+    cmd = [
+        "bcftools",
+        "annotate",
+        "-x",
+        "INFO,^FORMAT/GT",
+        "-Oz",
+        "-o",
+        str(output_vcf),
+        str(input_vcf),
     ]
     _run_command(cmd)
 
